@@ -6,19 +6,25 @@
         shell=/bin/false
         state=present
 
-- name: Download Kibana
-  get_url: url=https://download.elasticsearch.org/kibana/kibana/kibana-{{ kibana_version }}-{{ kibana_os }}-{{ kibana_arch }}.zip
-           dest=/usr/local/src/kibana-{{ kibana_version }}-{{ kibana_os }}-{{ kibana_arch }}.zip
+# - name: Download Kibana
+#   get_url: url=https://download.elasticsearch.org/kibana/kibana/kibana-{{ kibana_version }}-{{ kibana_os }}-{{ kibana_arch }}.zip
+#            dest=/usr/local/src/kibana-{{ kibana_version }}-{{ kibana_os }}-{{ kibana_arch }}.zip
 
-- name: Extract and install Kibana
-  unarchive: src=/usr/local/src/kibana-{{ kibana_version }}-{{ kibana_os }}-{{ kibana_arch }}.zip
-             dest={{ kibana_dir }}
-             copy=no
-             creates={{ kibana_dir }}/kibana-{{ kibana_version }}-{{ kibana_os }}-{{ kibana_arch }}
+# - name: Extract and install Kibana
+#   unarchive: src=/usr/local/src/kibana-{{ kibana_version }}-{{ kibana_os }}-{{ kibana_arch }}.zip
+#              dest={{ kibana_dir }}
+#              copy=no
+#              creates={{ kibana_dir }}/kibana-{{ kibana_version }}-{{ kibana_os }}-{{ kibana_arch }}
+
+- name: Copy kibana yum to remote
+  copy: src=./kibana-4.6.1-x86_64.rpm dest=/tmp/kibana-4.6.1-x86_64.rpm owner=kibana group=kibana mode=777 
+
+- name: RedHat - Install Kibana
+  yum: name=/tmp/kibana-4.6.1-x86_64.rpm state=present
 
 - name: Configure Kibana
   template: src=kibana.yml.j2
-            dest={{ kibana_dir }}/kibana-{{ kibana_version }}-{{ kibana_os }}-{{ kibana_arch }}/config/kibana.yml
+            dest={{ kibana_dir }}/kibana/config/kibana.yml
   notify:
     - Restart Kibana
 
